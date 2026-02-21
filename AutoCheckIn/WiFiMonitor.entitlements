@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- KRITISKT: Sandboxing DISABLED för CoreWLAN access -->
+	<!-- Detta löser permissions-problemet från tidigare försök -->
+	<key>com.apple.security.app-sandbox</key>
+	<false/>
+
+	<!-- Network access för Slack API -->
+	<key>com.apple.security.network.client</key>
+	<true/>
+
+	<!-- Location Services krävs för CoreWLAN SSID-access med hardened runtime -->
+	<key>com.apple.security.personal-information.location</key>
+	<true/>
+</dict>
+</plist>
