@@ -26,7 +26,3 @@ build/
 
 # Logs
 *.log
-
-# Removed assets (kept locally for Xcode project reference)
-AutoCheckIn/Assets.xcassets/UR_logotypRGB_Vit.png
-AutoCheckIn/UR_logotypRGB_Vit.png
