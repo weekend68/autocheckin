@@ -11,21 +11,25 @@ A macOS menu bar app that monitors WiFi networks and automatically sends a check
 - Manual check-in from the menu bar at any time
 - Network change log at `~/autocheckin_log.txt`
 
-## Requirements
+## Installation
 
-- macOS 13 or later
-- Xcode 15 or later (to build)
-- A Slack [user token](https://api.slack.com/authentication/token-types) (`xoxp-...`)
-
-## Setup
-
-1. Open `AutoCheckIn.xcodeproj` in Xcode
-2. Build and run (`⌘R`)
-3. Grant **Location Services** permission when prompted (required for CoreWLAN SSID access)
-4. Grant **Notifications** permission when prompted
+1. Download `AutoCheckIn.zip` from the [latest release](https://github.com/weekend68/autocheckin/releases/latest)
+2. Unzip and move `AutoCheckIn.app` to `/Applications`
+3. **First launch:** right-click the app → **Open** (required once to bypass Gatekeeper — the app is not notarised)
+4. Grant **Location Services** and **Notifications** permissions when prompted
 5. Click the menu bar icon → **Settings**
 6. Enter your Slack token and channel
 7. Add your WiFi network(s): set the SSID, a check-in message, and enable **Auto check-in**
+
+## Requirements
+
+- macOS 13 or later
+- A Slack [user token](https://api.slack.com/authentication/token-types) (`xoxp-...`)
+
+## Building from source
+
+1. Open `AutoCheckIn.xcodeproj` in Xcode 15 or later
+2. Build and run (`⌘R`)
 
 ## How it works
 
