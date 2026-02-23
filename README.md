@@ -15,7 +15,7 @@ A macOS menu bar app that monitors WiFi networks and automatically sends a check
 
 1. Download `AutoCheckIn.zip` from the [latest release](https://github.com/weekend68/autocheckin/releases/latest)
 2. Unzip and move `AutoCheckIn.app` to `/Applications`
-3. **First launch:** right-click the app → **Open** (required once to bypass Gatekeeper — the app is not notarised)
+3. **First launch:** double-click the app — macOS will block it since it is not notarised. Open **System Settings → Privacy & Security**, scroll down to the blocked app notice, click **Open Anyway**, and confirm with your password
 4. Grant **Location Services** and **Notifications** permissions when prompted
 5. Click the menu bar icon → **Settings**
 6. Enter your Slack token and channel
