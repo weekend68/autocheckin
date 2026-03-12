@@ -27,10 +27,32 @@ class WiFiMonitorService: NSObject, ObservableObject {
     private func setupLocationManager() {
         locationManager.delegate = self
         let status = locationManager.authorizationStatus
+        print("📍 Location status at init: \(status.rawValue) (\(statusDescription(status)))")
         if status == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
+        }
+        checkLocationStatus()
+    }
+
+    private func checkLocationStatus() {
+        let status = locationManager.authorizationStatus
+        let denied = (status == .denied || status == .restricted)
+        print("📍 checkLocationStatus: \(statusDescription(status)) → locationPermissionDenied=\(denied)")
+        if Thread.isMainThread {
+            locationPermissionDenied = denied
         } else {
-            locationPermissionDenied = (status == .denied || status == .restricted)
+            DispatchQueue.main.async { self.locationPermissionDenied = denied }
+        }
+    }
+
+    private func statusDescription(_ status: CLAuthorizationStatus) -> String {
+        switch status {
+        case .notDetermined: return "notDetermined"
+        case .restricted: return "restricted"
+        case .denied: return "denied"
+        case .authorizedAlways: return "authorizedAlways"
+        case .authorizedWhenInUse: return "authorizedWhenInUse"
+        @unknown default: return "unknown(\(status.rawValue))"
         }
     }
 
@@ -48,8 +70,10 @@ class WiFiMonitorService: NSObject, ObservableObject {
             print("⚠️ Failed to start CoreWLAN monitoring: \(error)")
         }
 
-        // Fallback: poll every 10 seconds in case delegate misses an event
+        // Fallback: poll every 10 seconds in case delegate misses an event.
+        // Also re-checks location status so the warning updates without restart.
         timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
+            self?.checkLocationStatus()
             self?.checkCurrentNetwork()
         }
 
@@ -116,21 +140,7 @@ extension WiFiMonitorService: CWEventDelegate {
 
 extension WiFiMonitorService: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        let status = manager.authorizationStatus
-        DispatchQueue.main.async {
-            switch status {
-            case .authorizedAlways, .authorizedWhenInUse:
-                print("✅ Location Services authorized")
-                self.locationPermissionDenied = false
-            case .denied, .restricted:
-                print("❌ Location Services denied — WiFi monitoring will not work!")
-                print("💡 Enable in System Settings → Privacy & Security → Location Services")
-                self.locationPermissionDenied = true
-            case .notDetermined:
-                print("⏳ Location Services authorization pending...")
-            @unknown default:
-                print("⚠️ Unknown location authorization status")
-            }
-        }
+        print("📍 locationManagerDidChangeAuthorization: \(statusDescription(manager.authorizationStatus)) (thread: \(Thread.isMainThread ? "main" : "bg"))")
+        checkLocationStatus()
     }
 }
