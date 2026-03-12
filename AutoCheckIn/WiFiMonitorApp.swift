@@ -6,8 +6,10 @@ struct WiFiMonitorApp: App {
     @StateObject private var viewModel = WiFiMonitorViewModel()
 
     var body: some Scene {
-        MenuBarExtra("", systemImage: viewModel.locationPermissionDenied ? "exclamationmark.triangle.fill" : "person.wave.2") {
+        MenuBarExtra {
             MenuBarView(viewModel: viewModel)
+        } label: {
+            Image(systemName: viewModel.locationPermissionDenied ? "exclamationmark.triangle.fill" : "person.wave.2")
         }
     }
 }

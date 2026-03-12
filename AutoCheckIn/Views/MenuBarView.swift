@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MenuBarView: View {
-    @StateObject var viewModel: WiFiMonitorViewModel
+    @ObservedObject var viewModel: WiFiMonitorViewModel
 
     var body: some View {
         VStack(spacing: 0) {

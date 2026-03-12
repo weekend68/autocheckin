@@ -116,18 +116,21 @@ extension WiFiMonitorService: CWEventDelegate {
 
 extension WiFiMonitorService: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        switch manager.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
-            print("✅ Location Services authorized")
-            locationPermissionDenied = false
-        case .denied, .restricted:
-            print("❌ Location Services denied — WiFi monitoring will not work!")
-            print("💡 Enable in System Settings → Privacy & Security → Location Services")
-            locationPermissionDenied = true
-        case .notDetermined:
-            print("⏳ Location Services authorization pending...")
-        @unknown default:
-            print("⚠️ Unknown location authorization status")
+        let status = manager.authorizationStatus
+        DispatchQueue.main.async {
+            switch status {
+            case .authorizedAlways, .authorizedWhenInUse:
+                print("✅ Location Services authorized")
+                self.locationPermissionDenied = false
+            case .denied, .restricted:
+                print("❌ Location Services denied — WiFi monitoring will not work!")
+                print("💡 Enable in System Settings → Privacy & Security → Location Services")
+                self.locationPermissionDenied = true
+            case .notDetermined:
+                print("⏳ Location Services authorization pending...")
+            @unknown default:
+                print("⚠️ Unknown location authorization status")
+            }
         }
     }
 }
