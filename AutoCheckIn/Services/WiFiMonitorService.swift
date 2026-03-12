@@ -36,13 +36,14 @@ class WiFiMonitorService: NSObject, ObservableObject {
 
     private func checkLocationStatus() {
         let status = locationManager.authorizationStatus
-        let denied = (status == .denied || status == .restricted)
-        print("📍 checkLocationStatus: \(statusDescription(status)) → locationPermissionDenied=\(denied)")
-        if Thread.isMainThread {
-            locationPermissionDenied = denied
-        } else {
-            DispatchQueue.main.async { self.locationPermissionDenied = denied }
+        // Treat everything except explicit authorization as denied:
+        // .notDetermined means macOS blocks SSID access even without user interaction.
+        let denied = (status != .authorizedAlways)
+        print("📍 checkLocationStatus: \(statusDescription(status)) → denied=\(denied)")
+        let update = { [self] in
+            if locationPermissionDenied != denied { locationPermissionDenied = denied }
         }
+        if Thread.isMainThread { update() } else { DispatchQueue.main.async(execute: update) }
     }
 
     private func statusDescription(_ status: CLAuthorizationStatus) -> String {
@@ -51,7 +52,6 @@ class WiFiMonitorService: NSObject, ObservableObject {
         case .restricted: return "restricted"
         case .denied: return "denied"
         case .authorizedAlways: return "authorizedAlways"
-        case .authorizedWhenInUse: return "authorizedWhenInUse"
         @unknown default: return "unknown(\(status.rawValue))"
         }
     }
