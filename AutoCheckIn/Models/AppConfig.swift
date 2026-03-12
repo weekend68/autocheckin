@@ -15,6 +15,7 @@ struct AppDefaults {
     static let slackToken = "slackToken"
     static let slackChannel = "slackChannel"
     static let lastWorkNotification = "lastWorkNotification"
+    static let lastLocationDeniedNotification = "lastLocationDeniedNotification"
     static let migrationComplete = "migrationComplete"
     static let wifiEntries = "wifiEntries"
 

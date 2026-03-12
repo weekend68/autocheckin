@@ -4,6 +4,7 @@ import Combine
 class WiFiMonitorViewModel: ObservableObject {
     @Published var currentSSID: String?
     @Published var isMonitoring: Bool = false
+    @Published var locationPermissionDenied: Bool = false
 
     private let wifiService = WiFiMonitorService.shared
     private let loggerService = LoggerService.shared
@@ -30,6 +31,18 @@ class WiFiMonitorViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] monitoring in
                 self?.isMonitoring = monitoring
+            }
+            .store(in: &cancellables)
+
+        wifiService.$locationPermissionDenied
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] denied in
+                self?.locationPermissionDenied = denied
+                if denied {
+                    Task {
+                        await self?.notificationService.notifyLocationPermissionDenied()
+                    }
+                }
             }
             .store(in: &cancellables)
 

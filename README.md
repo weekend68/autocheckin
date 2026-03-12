@@ -10,6 +10,7 @@ A macOS menu bar app that monitors WiFi networks and automatically sends a check
 - Multiple networks supported — each with its own message
 - Manual check-in from the menu bar at any time
 - Network change log at `~/autocheckin_log.txt`
+- Warning icon and menu notification if Location Services access is denied
 
 ## Installation
 
@@ -54,9 +55,18 @@ The `generate_icon.swift` script renders the `person.wave.2` SF Symbol and expor
 swift generate_icon.swift
 ```
 
+## Location Services
+
+AutoCheckIn requires Location Services access for CoreWLAN to return the current SSID. Without it, no WiFi changes are detected and no automatic check-ins occur.
+
+If access is denied:
+- The menu bar icon changes to a warning triangle (`⚠`)
+- A banner appears at the top of the menu with a link to open System Settings → Privacy & Security → Location Services
+- A notification is sent (at most once per day)
+
 ## Privacy
 
-- Location is used only to fetch local weather; coordinates are sent to Open-Meteo and not stored
+- Location is used to (1) fetch local weather and (2) let CoreWLAN read the current SSID; coordinates are sent to Open-Meteo and not stored
 - Slack tokens are stored in `UserDefaults` (local to your Mac, not synced)
 
 ## License

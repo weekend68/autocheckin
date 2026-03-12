@@ -11,6 +11,7 @@ class WiFiMonitorService: NSObject, ObservableObject {
 
     @Published var currentSSID: String?
     @Published var isMonitoring: Bool = false
+    @Published var locationPermissionDenied: Bool = false
 
     private let wifiClient = CWWiFiClient.shared()
     private var timer: Timer?
@@ -25,8 +26,11 @@ class WiFiMonitorService: NSObject, ObservableObject {
 
     private func setupLocationManager() {
         locationManager.delegate = self
-        if locationManager.authorizationStatus == .notDetermined {
+        let status = locationManager.authorizationStatus
+        if status == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
+        } else {
+            locationPermissionDenied = (status == .denied || status == .restricted)
         }
     }
 
@@ -115,9 +119,11 @@ extension WiFiMonitorService: CLLocationManagerDelegate {
         switch manager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             print("✅ Location Services authorized")
+            locationPermissionDenied = false
         case .denied, .restricted:
             print("❌ Location Services denied — WiFi monitoring will not work!")
             print("💡 Enable in System Settings → Privacy & Security → Location Services")
+            locationPermissionDenied = true
         case .notDetermined:
             print("⏳ Location Services authorization pending...")
         @unknown default:

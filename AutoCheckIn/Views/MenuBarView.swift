@@ -5,6 +5,34 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if viewModel.locationPermissionDenied {
+                Button(action: openLocationSettings) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.yellow)
+                            .frame(width: 20, alignment: .center)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Platstillgång saknas")
+                                .fontWeight(.semibold)
+                            Text("Klicka för att öppna Systeminställningar")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(PlainButtonStyle())
+                .onHover { hovering in
+                    if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                }
+
+                Divider()
+                    .padding(.vertical, 0)
+            }
+
             MenuButton(
                 icon: "paperplane.fill",
                 title: "Check in to Slack",
@@ -35,6 +63,12 @@ struct MenuBarView: View {
         }
         .frame(minWidth: 220, maxWidth: 260)
         .fixedSize(horizontal: true, vertical: false)
+    }
+
+    private func openLocationSettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices") {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     private func openSettings() {
