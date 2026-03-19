@@ -77,22 +77,37 @@ class MessageGeneratorService: NSObject {
 
         guard let url = URL(string: urlString) else { return nil }
 
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let response = try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
-            let temp = response.current.temperature_2m
-            let code = response.current.weathercode
-            let result = WeatherResult(temperature: temp, emoji: wmoEmoji(code))
+        let retryDelays: [UInt64] = [3, 5, 10]
+        var lastError: Error?
 
-            cachedWeather = result
-            cacheTime = Date()
+        for attempt in 0...retryDelays.count {
+            if attempt > 0 {
+                let delay = retryDelays[attempt - 1]
+                print("🔄 Weather retry \(attempt) in \(delay)s...")
+                try? await Task.sleep(nanoseconds: delay * 1_000_000_000)
+            }
+            do {
+                let (data, _) = try await URLSession.shared.data(from: url)
+                let response = try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
+                let temp = response.current.temperature_2m
+                let code = response.current.weathercode
+                let result = WeatherResult(temperature: temp, emoji: wmoEmoji(code))
 
-            print("🌤️ Weather: \(result.emoji) \(Int(temp.rounded()))°C (WMO \(code))")
-            return result
-        } catch {
-            print("⚠️ Open-Meteo fetch failed: \(error)")
-            return nil
+                cachedWeather = result
+                cacheTime = Date()
+
+                print("🌤️ Weather: \(result.emoji) \(Int(temp.rounded()))°C (WMO \(code))")
+                return result
+            } catch let error as URLError where error.code == .notConnectedToInternet {
+                lastError = error
+            } catch {
+                print("⚠️ Open-Meteo fetch failed: \(error)")
+                return nil
+            }
         }
+
+        print("⚠️ Open-Meteo fetch failed after retries: \(lastError!)")
+        return nil
     }
 
     // MARK: - Location
