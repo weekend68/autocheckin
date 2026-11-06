@@ -10,9 +10,11 @@ till konfigurerade WiFi-nät (t.ex. kontoret).
 
 ## Kommandon
 - `xcodebuild -scheme AutoCheckIn -configuration Release` — bygg release
-- `codesign --sign ...` — signera app (kräver Developer ID)
+- Signering: ad-hoc (`CODE_SIGN_IDENTITY = "-"`, inget Developer ID/Team) —
+  därför måste användare kringgå Gatekeeper vid första start (se README)
 
 ## Viktigt
 - macOS-app: kompilera och testa på Mac med Xcode
-- WiFi-detektion kräver CoreWLAN-rättigheter i sandbox-konfigurationen
+- App Sandbox är avstängd (`WiFiMonitor.entitlements`). CoreWLAN kräver
+  Location Services-behörighet för att få ut SSID — utan den blir SSID nil
 - Releases publiceras på GitHub med `gh release create`
